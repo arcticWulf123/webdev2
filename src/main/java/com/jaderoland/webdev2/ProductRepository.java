@@ -9,6 +9,9 @@ import org.springframework.stereotype.Repository;
 public class ProductRepository {
     private List<Product> products = new ArrayList<>();
 
+    public ProductRepository() {
+    }
+
     public ProductRepository(List<Product> products) {
         this.products = products;
     }
