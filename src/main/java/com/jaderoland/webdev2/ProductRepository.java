@@ -12,6 +12,9 @@ public class ProductRepository {
     public ProductRepository() {
     }
 
+    public void addProduct(Product product) {
+        products.add(product);
+    }
     public ProductRepository(List<Product> products) {
         this.products = products;
     }
