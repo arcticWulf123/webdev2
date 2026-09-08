@@ -10,6 +10,9 @@ public class BookService {
     
     public BookService(BookRepository bookRepository) {
         this.bookRepository = bookRepository;
+        bookRepository.addBooks(new Book("Harry Potter", "JJ Tolkien", 1L));
+        bookRepository.addBooks(new Book("Diary of the Wimpy Kid", "bruh", 2L));
+        bookRepository.addBooks(new Book("Rich dad poor dad", "Rpbert Kiyosaki", 3L));
     }
 
     public List<Book> returnAllBooks () {
