@@ -19,4 +19,8 @@ public class BookService {
     public Book getBookById (Long id) {
         return bookRepository.getBooks().stream().filter(b -> b.getId().equals(id)).findFirst().orElse(null);
     }
+
+    public void addBook (Book book) {
+        bookRepository.addBooks(book);
+    }
 }
