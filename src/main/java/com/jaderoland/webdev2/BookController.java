@@ -3,13 +3,11 @@ package com.jaderoland.webdev2;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 
 @Controller
 @RequestMapping("/books")
@@ -38,20 +36,23 @@ public class BookController {
 
     @GetMapping("/{id}")
     @ResponseBody
-    public Book getBookById(@PathVariable("id") Long bookId, Model model) {
+    public ResponseEntity<Book> getBookById(@PathVariable("id") Long bookId, Model model) {
         for (Book b : bookService.returnAllBooks()) {
             if (b.getId() == bookId) {
                 model.addAttribute("book", b);
-                return bookService.getBookById(bookId);
+                return ResponseEntity.ok(bookService.getBookById(bookId));
             }
         }
-        return null;
+        return ResponseEntity.notFound().build();
     }
 
     @PostMapping()
-    public String postMethodName(@RequestParam String title, @RequestParam  String author, @RequestParam Long bookId) {
-        bookService.addBook(new Book(title, author, bookId));
-        return "redirect:/books";
+    @ResponseStatus(HttpStatus.CREATED)
+    @ResponseBody
+    public Book createBook(@RequestParam String title, @RequestParam String author, @RequestParam Long bookId) {
+        Book book = new Book(title, author, bookId);
+        bookService.addBook(book);
+        return book;
     }
 
 }
