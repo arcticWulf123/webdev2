@@ -7,18 +7,17 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public class BookRepository {
-    private List<Book> books = new ArrayList<>();
+    private final List<Book> books = new ArrayList<>();
 
-    public BookRepository(List<Book> books) {
-        this.books = books;
+    public BookRepository() {
+        books.add(new Book("Clean Code", "Robert C. Martin", 1L));
+        books.add(new Book("Effective Java", "Joshua Bloch", 2L));
+        books.add(new Book("Domain-Driven Design", "Eric Evans", 3L));
+        books.add(new Book("Systems Design Course", "Eric Evans", 3L));
     }
 
     public List<Book> getBooks() {
         return books;
-    }
-
-    public void setBooks(List<Book> books) {
-        this.books = books;
     }
 
     public void addBooks(Book book) {

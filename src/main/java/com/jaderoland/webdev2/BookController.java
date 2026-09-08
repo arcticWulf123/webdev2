@@ -1,13 +1,15 @@
 package com.jaderoland.webdev2;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
-@Controller
+@RestController
 @RequestMapping("/books")
 public class BookController {
 
@@ -17,13 +19,23 @@ public class BookController {
         this.bookService = bookService;
     }
 
-    @GetMapping ("/books")
-    public List<Book> getAllBooks () {
-        return bookService.returnAllBooks();
+    @GetMapping
+    public List<Book> getAllBooks(@RequestParam(required = false) String author) {
+        if ((author == null)) {
+            return bookService.returnAllBooks();
+        }
+        List<Book> filteredBooks = new ArrayList<>();
+        for (Book b : bookService.returnAllBooks()) {
+            if (b.getAuthor().equalsIgnoreCase(author)) {
+                filteredBooks.add(b);
+            }
+        }
+        return filteredBooks;
     }
 
-    @GetMapping ("/{id}")
+    @GetMapping("/{id}")
     public Book getBookById(@PathVariable("id") Long bookId) {
+
         return bookService.getBookById(bookId);
     }
 }
