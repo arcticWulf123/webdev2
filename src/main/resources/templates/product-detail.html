@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detail of Product</title>
+</head>
+<body>
+    <div th:replace="~{fragments/navbar :: navbar}"></div>
+    <article>
+        <h1 th:text="${product.productName}">Product Name</h1>
+        <p th:text="${product.price}">Product Price</p>
+        <p th:text="${product.productId}">Product Id</p>
+        <p th:text="${product.category.category}">Product Category</p>
+    </article>
+</body>
+</html>
