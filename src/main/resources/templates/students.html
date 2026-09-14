@@ -3,15 +3,15 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Product List</title>
+    <title>Student List</title>
   </head>
   <body>
     <div th:replace="~{fragments/navbar :: navbar}"></div>
     <ul>
-      <li th:each="product : ${products}" th:text="${product.productName}">
-        Product Title
+      <li th:each="student : ${students}" th:text="${student.name}">
+        Student Names
       </li>
     </ul>
-    <p th:if="${products.isEmpty()}">No products found.</p>
+    <p th:if="${students.isEmpty()}">No students found.</p>
   </body>
 </html>
