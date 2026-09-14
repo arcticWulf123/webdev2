@@ -7,11 +7,16 @@
   </head>
   <body>
     <div th:replace="~{fragments/navbar :: navbar}"></div>
-    <ul>
-      <li th:each="student : ${students}" th:text="${student.name}">
-        Student Names
-      </li>
-    </ul>
+    <table>
+      <tr>
+        <thead>
+          Student Database
+        </thead>
+      </tr>
+      <tr>
+        <td th:each="student : ${students}" th:text="${student.name}"></td>
+      </tr>
+    </table>
     <p th:if="${students.isEmpty()}">No students found.</p>
   </body>
 </html>

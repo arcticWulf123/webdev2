@@ -21,7 +21,7 @@ public class StudentRepository {
         studentList.add(student);
     }
 
-    public void deleteStudent(Student student) {
+    public void deleteStudent(Student student, Long id) {
         studentList.remove(student);
     }
 
