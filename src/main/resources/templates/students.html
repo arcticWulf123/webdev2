@@ -6,6 +6,7 @@
     <title>Student List</title>
   </head>
   <body>
+    <div th:replace="~{fragments/navbar :: navbar}"></div>
     <table>
       <tr th:each="student : ${students}">
         <td th:text="${student.Id}"></td>

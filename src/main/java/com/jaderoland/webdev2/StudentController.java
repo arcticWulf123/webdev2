@@ -15,13 +15,6 @@ import org.springframework.web.bind.annotation.*;
 public class StudentController {
     private final StudentService studentService;
 
-    /*
-     * TODO:
-     * 1. Edit endpoint is working
-     * 2. Edit endpoint returns errors in the form, if any
-     * 
-     * 
-     */
     public StudentController(StudentService studentService) {
         this.studentService = studentService;
     }
@@ -33,7 +26,7 @@ public class StudentController {
         return "students";
     }
 
-    @PostMapping()
+    @PostMapping("/create")
     public String createStudent(@Valid @ModelAttribute("student") Student student, BindingResult result) {
         if (result.hasErrors()) {
             return "create-student-form";

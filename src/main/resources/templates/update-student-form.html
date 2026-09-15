@@ -13,10 +13,13 @@
     >
       <label>Name</label>
       <input type="text" th:field="*{name}" />
+      <p th:errors="*{name}"></p>
       <label>Age</label>
       <input type="number" th:field="*{age}" />
+      <p th:errors="*{age}"></p>
       <label>Email</label>
       <input type="email" th:field="*{email}" />
+      <p th:errors="*{email}"></p>
       <label>Course</label>
       <input type="text" th:field="*{course}" />
 
