@@ -5,7 +5,6 @@ import java.util.List;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.RequestMapping;
 
 import jakarta.validation.Valid;
 
@@ -18,8 +17,9 @@ public class StudentController {
 
     /*
      * TODO:
-     * 1. Create delete endpoint, link must be available to delete a student
-     * 2. Create edit endpoint and edit form
+     * 1. Edit endpoint is working
+     * 2. Edit endpoint returns errors in the form, if any
+     * 
      * 
      */
     public StudentController(StudentService studentService) {
@@ -51,9 +51,40 @@ public class StudentController {
         return "redirect:/students";
     }
 
+    @GetMapping("/edit/{id}")
+    public String showEditStudentForm(@PathVariable("id") Long id, Model model) {
+        Student student = studentService.getStudentById(id);
+
+        if (student == null) {
+            return "redirect:/students";
+        }
+
+        model.addAttribute("student", student);
+        model.addAttribute("id", id);
+        return "update-student-form";
+    }
+
     @GetMapping("/create")
     public String showCreateStudentForm(Model model) {
         model.addAttribute("student", new Student());
         return "create-student-form";
+    }
+
+    @PostMapping("/edit/{id}")
+    public String editStudent(@PathVariable("id") Long id,
+            @Valid @ModelAttribute("student") Student updatedStudent,
+            BindingResult result,
+            Model model) {
+        if (studentService.getStudentById(id) == null) {
+            return "redirect:/students";
+        }
+
+        if (result.hasErrors()) {
+            model.addAttribute("id", id);
+            return "update-student-form";
+        }
+
+        studentService.updateStudent(updatedStudent, id);
+        return "redirect:/students";
     }
 }

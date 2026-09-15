@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <form
+      th:action="@{/students/edit/{id}(id=${id})}"
+      th:object="${student}"
+      method="post"
+    >
+      <label>Name</label>
+      <input type="text" th:field="*{name}" />
+      <label>Age</label>
+      <input type="number" th:field="*{age}" />
+      <label>Email</label>
+      <input type="email" th:field="*{email}" />
+      <label>Course</label>
+      <input type="text" th:field="*{course}" />
+
+      <button type="submit">Save</button>
+    </form>
+  </body>
+</html>

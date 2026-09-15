@@ -25,9 +25,9 @@ public class StudentRepository {
         studentList.remove(studentList.stream().filter(s -> s.getId().equals(id)).findAny().orElse(null));
     }
 
-    public void updateStudentDetails(Long Id, Student updatedStudent) {
+    public void updateStudentDetails(Long id, Student updatedStudent) {
         for (Student s : studentList) {
-            if (s.getId().equals(updatedStudent.getId())) {
+            if (s.getId().equals(id)) {
                 s.setName(updatedStudent.getName());
                 s.setAge(updatedStudent.getAge());
                 s.setEmail(updatedStudent.getEmail());
