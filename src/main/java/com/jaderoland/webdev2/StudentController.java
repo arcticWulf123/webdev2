@@ -17,11 +17,11 @@ public class StudentController {
     private final StudentService studentService;
 
     /*
-    TODO:
-    1. Create delete endpoint, link must be available to delete a student
-    2. Create edit endpoint and edit form
-    
-    */
+     * TODO:
+     * 1. Create delete endpoint, link must be available to delete a student
+     * 2. Create edit endpoint and edit form
+     * 
+     */
     public StudentController(StudentService studentService) {
         this.studentService = studentService;
     }
@@ -42,42 +42,18 @@ public class StudentController {
         return "redirect:/students";
     }
 
-    @PostMapping("/{id}/delete")
+    @PostMapping("/delete/{id}")
     public String deleteStudent(@PathVariable Long id) {
         Student student = studentService.getStudentById(id);
         if (student != null) {
-            studentService.deleteStudent(student, id);
+            studentService.deleteStudent(id);
         }
-
         return "redirect:/students";
     }
-
-    // @PostMapping()
-    // public String createStudent(@Valid @ModelAttribute("student") Student
-    // student, BindingResult result) {
-    // if (result.hasErrors()) {
-    // return "student-form";
-    // }
-    // studentService.createStudent(student);
-    // return "redirect:/students";
-    // }
 
     @GetMapping("/create")
     public String showCreateStudentForm(Model model) {
         model.addAttribute("student", new Student());
         return "create-student-form";
     }
-
-    @GetMapping("/delete")
-    public String showDeleteStudentForm(Model model) {
-        model.addAttribute("student", new Student());
-        return "delete-student-form";
-    }
-
-    // @GetMapping("/create")
-    // public String showCreateStudentForm(Model model) {
-    // model.addAttribute("student", new Student());
-    // return "student-form";
-    // }
-
 }

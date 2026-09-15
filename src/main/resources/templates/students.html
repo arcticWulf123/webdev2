@@ -6,15 +6,22 @@
     <title>Student List</title>
   </head>
   <body>
-    <div th:replace="~{fragments/navbar :: navbar}"></div>
     <table>
-      <tr>
-        <thead>
-          Student Database
-        </thead>
-      </tr>
-      <tr>
-        <td th:each="student : ${students}" th:text="${student.name}"></td>
+      <tr th:each="student : ${students}">
+        <td th:text="${student.Id}"></td>
+        <td th:text="${student.name}"></td>
+        <td th:text="${student.course}"></td>
+
+        <td>
+          <a th:href="@{/students/edit/{id}(id=${student.Id})}"> Edit </a>
+
+          <form
+            th:action="@{/students/delete/{id}(id=${student.Id})}"
+            method="post"
+          >
+            <button type="submit">Delete</button>
+          </form>
+        </td>
       </tr>
     </table>
     <p th:if="${students.isEmpty()}">No students found.</p>

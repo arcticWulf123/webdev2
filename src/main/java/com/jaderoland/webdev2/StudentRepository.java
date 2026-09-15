@@ -21,8 +21,8 @@ public class StudentRepository {
         studentList.add(student);
     }
 
-    public void deleteStudent(Student student, Long id) {
-        studentList.remove(student);
+    public void deleteStudent(Long id) {
+        studentList.remove(studentList.stream().filter(s -> s.getId().equals(id)).findAny().orElse(null));
     }
 
     public void updateStudentDetails(Long Id, Student updatedStudent) {
