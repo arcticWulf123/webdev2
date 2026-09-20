@@ -1,0 +1,16 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <article th:each="task : ${tasks}">
+      <h2 th:text="${task.title}"></h2>
+      <h4 th:text="${task.completed}"></h4>
+      <a th:href="@{/tasks/{id}(id=${task.id})}">See more details</a>
+    </article>
+    <p th:if="${tasks.isEmpty()}">No tasks found.</p>
+  </body>
+</html>
