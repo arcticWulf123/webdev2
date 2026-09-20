@@ -1,12 +1,13 @@
-package com.jaderoland.webdev2;
+package com.prelim.taskmanager;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class Webdev2Application {
+public class TaskmanagerApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(Webdev2Application.class, args);
+		SpringApplication.run(TaskmanagerApplication.class, args);
 	}
+
 }

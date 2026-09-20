@@ -1,10 +1,10 @@
-package com.jaderoland.webdev2;
+package com.prelim.taskmanager;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class Webdev2ApplicationTests {
+class TaskmanagerApplicationTests {
 
 	@Test
 	void contextLoads() {
