@@ -1,8 +1,14 @@
 package com.prelim.taskmanager.model;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+
 public class Task {
     private Long id;
+    @NotBlank(message = "this field cannot be blank")
+    @Size (max = 100, message = "Your task title should not exceed more than 100 words")
     private String title;
+    @Size (max = 500, message = "Your description should not exceed 500 words")
     private String description;
     private boolean completed;
 
@@ -11,6 +17,9 @@ public class Task {
         this.title = title;
         this.description = description;
         this.completed = completed;
+    }
+
+    public Task() {
     }
 
     public Long getId() {

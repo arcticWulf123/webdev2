@@ -6,6 +6,7 @@
     <title>Document</title>
   </head>
   <body>
+    <a th:href="@{/tasks/new}">Create a new task</a>
     <article th:each="task : ${tasks}">
       <h2 th:text="${task.title}"></h2>
       <h4 th:text="${task.completed}"></h4>

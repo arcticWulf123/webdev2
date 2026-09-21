@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>Task not found...</h1>
+    <p th:text="${errorMessage}">The requested task could not be found.</p>
+    <a th:href="@{/tasks}">Back to tasks</a>
+</body>
+</html>
