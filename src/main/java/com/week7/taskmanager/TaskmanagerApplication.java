@@ -1,4 +1,4 @@
-package com.prelim.taskmanager;
+package com.week7.taskmanager;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
