@@ -1,43 +1,35 @@
 package com.week9.activity;
 
-import java.util.List;
-
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
-
-import jakarta.persistence.EntityManager;
-import jakarta.transaction.Transactional;
 
 @Component
 public class DemoRunner implements CommandLineRunner {
     private final DepartmentRepository departmentRepository;
-    private final EntityManager entityManager;
+    private final EmployeeRepository employeeRepository;
+    private final EmployeeService employeeService;
 
-    public DemoRunner(DepartmentRepository departmentRepository, EntityManager entityManager) {
+    public DemoRunner(DepartmentRepository departmentRepository, EmployeeRepository employeeRepository,
+            EmployeeService employeeService) {
         this.departmentRepository = departmentRepository;
-        this.entityManager = entityManager;
+        this.employeeRepository = employeeRepository;
+        this.employeeService = employeeService;
     }
 
     @Override
-    @Transactional
     public void run(String... args) {
-        Department department = new Department();
+        Department dept = new Department();
+        dept.setName("IT");
+        departmentRepository.save(dept);
 
-        department.addEmployee(new Employee());
-        department.addEmployee(new Employee());
+        Employee emp = new Employee();
+        emp.setDepartment(dept);
+        employeeRepository.save(emp);
 
-        departmentRepository.saveAndFlush(department);
+        String deptName = employeeService.getDepartmentName(emp.getId());
+        System.out.println("Department" + deptName);
 
-        // Clears cached objects, so findAll() reads from the database.
-        entityManager.clear();
-
-        List<Department> departments = departmentRepository.findAll();
-
-        for (Department foundDepartment : departments) {
-            System.out.println(
-                    "Department ID: " + foundDepartment.getId()
-                            + " | Employees: " + foundDepartment.getEmployees().size());
-        }
+        Employee e = employeeService.getEmployeeWithDepartment(emp.getId());
+        System.out.println(e.getDepartment().getName());
     }
-
 }

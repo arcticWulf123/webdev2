@@ -13,21 +13,22 @@ Date submitted:
 I set the owning sides by giving them the @JoinColumn annotation, I applied these on the Employee and the User class. While on the other hand, I used the mappedBy annotation to UserProfile and Department classes, I also added the helper methods in the Department class such as addEmployee(), removeEmployee() and findAll().
 
 **Code / endpoint(s) used (if applicable):**
+
 ```java
-@Entity 
+@Entity
 public class User {
-    @Id 
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne 
+    @OneToOne
     @JoinColumn(name = "profile_id")
     private UserProfile profile;
 }
 
-@Entity 
+@Entity
 public class UserProfile {
-    @Id 
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
@@ -35,12 +36,12 @@ public class UserProfile {
     private User user;
 }
 
-@Entity 
+@Entity
 public class Department {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
+
     public Long getId() {
         return id;
     }
@@ -114,49 +115,269 @@ public class Employee {
 _Which entity owns the `Department`–`Employee` relationship and why, and what value must `mappedBy` contain?_
 
 Your answer:
-_[Write your answer here.]_
+The employee is the owner in the relationship between Employee - Department. The many side is the Employee, the many side always acts as the owning side in a Many to One and One to Many relationships. mappedBy must contain the value "Department".
 
 ---
 
 ## Task 2 — Many-to-Many Join Table + Association Entity
 
 **Approach / explanation:**
-_[Write 2–4 sentences describing your `@JoinTable` mapping and why you replaced it with `Enrollment`.]_
+I first used @ManyToMany with a join table, then switched to an Enrollment entity to store extra fields like enrollmentDate and grade. I added a unique constraint on (student_id, course_id) and tested duplicate rejection by using saveAndFlush() and catching DataIntegrityViolationException.
 
 **Code / endpoint(s) used (if applicable):**
+
 ```java
-// paste your Java/Spring Boot code, or relevant snippet, here
+@Entity
+public class Student {
+
+  public Student(Long id, String name) {
+    this.id = id;
+    this.name = name;
+  }
+
+  public Student () {}
+
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
+
+  private String name;
+
+  public Long getId() {
+    return id;
+  }
+
+  public void setId(Long id) {
+    this.id = id;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  @OneToMany(mappedBy = "student", cascade = CascadeType.ALL, orphanRemoval = true)
+  private List<Enrollment> enrollments = new ArrayList<>();
+
+  public void addEnrollment(Enrollment enrollment) {
+    enrollments.add(enrollment);
+    enrollment.setStudent(this);
+  }
+
+  public void removeEnrollment(Enrollment enrollment) {
+    enrollments.remove(enrollment);
+    enrollment.setStudent(null);
+  }
+
+  public List<Enrollment> getEnrollments() {
+    return enrollments;
+  }
+}
+
+@Entity
+public class Course {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String title;
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
+  private List<Enrollment> enrollments = new ArrayList<>();
+
+  public void addEnrollment(Enrollment enrollment) {
+    enrollments.add(enrollment);
+    enrollment.setCourse(this);
+  }
+
+  public void removeEnrollment(Enrollment enrollment) {
+    enrollments.remove(enrollment);
+    enrollment.setStudent(null);
+  }
+
+  public List<Enrollment> getEnrollments() {
+    return enrollments;
+  }
+}
+
+
+@Entity
+@Table(name = "enrollment", uniqueConstraints = @UniqueConstraint(name = "uk_student_course", columnNames = {
+        "student_id", "course_id" }))
+public class Enrollment {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    @ManyToOne
+    @JoinColumn(name = "student_id", nullable = false)
+    private Student student;
+
+    public Student getStudent() {
+        return student;
+    }
+
+    public void setStudent(Student student) {
+        this.student = student;
+    }
+
+    @ManyToOne
+    @JoinColumn(name = "course_id", nullable = false)
+    private Course course;
+
+    public Course getCourse() {
+        return course;
+    }
+
+    public void setCourse(Course course) {
+        this.course = course;
+    }
+
+    private LocalDate enrollmentDate;
+    private String grade;
+
+    public LocalDate getEnrollmentDate() {
+        return enrollmentDate;
+    }
+
+    public void setEnrollmentDate(LocalDate enrollmentDate) {
+        this.enrollmentDate = enrollmentDate;
+    }
+
+    public String getGrade() {
+        return grade;
+    }
+
+    public void setGrade(String grade) {
+        this.grade = grade;
+    }
+
+    public Enrollment() {
+    }
+
+    public Enrollment(Student student, Course course, LocalDate enrollmentDate, String grade) {
+        this.student = student;
+        this.course = course;
+        this.enrollmentDate = enrollmentDate;
+        this.grade = grade;
+    }
+
+}
+
 ```
 
 **Evidence (screenshot filename, request/response sample, or file reference in this folder):**
-_[e.g. `task2_enroll_ok.png`, `task2_duplicate_error.png`, or paste both responses here.]_
-
+![Task 2 save log](screenshots/task2_enroll_ok%20and%20error.png)
 **Reflection question:**
 _When must a many-to-many relationship be modeled as an association entity instead of a direct `@ManyToMany`, and what did the unique constraint protect in your test?_
 
 Your answer:
-_[Write your answer here.]_
+A many-to-many relationship must be modeled as an association entity if you need to add fields in a relationship. Adding the unique constraints to student_id and course_id prevents the same student from enrolling in the same course twice, protecting the database from duplicate entries.
 
 ---
 
 ## Task 3 — Fetch Strategies Experiment — LAZY vs EAGER
 
 **Approach / explanation:**
-_[Write 2–4 sentences describing how you reproduced the exception and the two fixes you compared.]_
+I set Employee.department to FetchType.LAZY and reproduced the LazyInitializationException by loading an Employee through a non-transactional EmployeeService method, then accessing e.getDepartment().getName() outside of a transaction. To fix this, I tried two approaches: first, I moved the access inside a @Transactional(readOnly = true) method so the Hibernate session stayed open, and second, I used a JOIN FETCH query in my EmployeeRepository to load both the Employee and Department in a single query. I then compared the number of SQL queries between all three cases. 
 
 **Code / endpoint(s) used (if applicable):**
+
 ```java
-// paste your Java/Spring Boot code, or relevant snippet, here
+@Entity
+public class Employee {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    public Employee(Long id, Department department) {
+        this.id = id;
+        this.department = department;
+    }
+
+    public Employee() {
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "department_id", nullable = false)
+    private Department department;
+
+    public Department getDepartment() {
+        return department;
+    }
+
+    public void setDepartment(Department department) {
+        this.department = department;
+    }
+}
+
+@Service
+public class EmployeeService {
+
+    private final EmployeeRepository employeeRepository;
+
+    public EmployeeService(EmployeeRepository employeeRepository) {
+        this.employeeRepository = employeeRepository;
+    }
+
+    public Employee getEmployee(Long id) {
+        return employeeRepository.findById(id).orElseThrow();
+    }
+
+    @Transactional(readOnly = true)
+    public String getDepartmentName(Long id) {
+        Employee e = employeeRepository.findById(id).orElseThrow();
+        return e.getDepartment().getName();
+    }
+
+    public Employee getEmployeeWithDepartment(Long id) {
+        return employeeRepository.findByIdwithDepartment(id).orElseThrow();
+    }
+}
+
+public interface EmployeeRepository extends JpaRepository<Employee,Long> {
+    
+    @Query("SELECT e FROM Employee e JOIN FETCH e.department WHERE e.id = :id")
+    Optional<Employee> findByIdwithDepartment(@Param("id") Long id);
+} 
 ```
 
 **Evidence (screenshot filename, request/response sample, or file reference in this folder):**
-_[e.g. `task3_lazy_exception.png`, `task3_sql_compare.png`, or paste the trace + SQL counts here.]_
+![Task 3 trace log](screenshots/task3_lazyexception.png)
+![Task 3 save](screenshots/task3_fix.png)
 
 **Reflection question:**
 _What causes `LazyInitializationException`, and why is prefer-LAZY plus explicit fetch join/`@EntityGraph` preferable to marking everything EAGER?_
 
 Your answer:
-_[Write your answer here.]_
+A LazyInitializationException happens when you try to access a lazily loaded proxy after the Hibernate session or transaction has been closed. Since the proxy was never initialized, Hibernate has no way to fetch it anymore. It's better to keep relationships as LAZY by default because making them EAGER loads all related data right away, which can lead to the N+1 problem and pull in way more data than needed. Using @Transactional or a fetch join lets us load exactly what we need, at the right time, while still keeping good performance.
 
 ---
 
@@ -166,6 +387,7 @@ _[Write your answer here.]_
 _[Write 2–4 sentences describing your safe cascade choice, the orphan-removal test, and why REMOVE was avoided for shared entities.]_
 
 **Code / endpoint(s) used (if applicable):**
+
 ```java
 // paste your Java/Spring Boot code, or relevant snippet, here
 ```
@@ -187,6 +409,7 @@ _[Write your answer here.]_
 _[Write 2–4 sentences describing how you translated your ERD entities, cardinalities, owning sides, and FK/join tables.]_
 
 **Code / endpoint(s) used (if applicable):**
+
 ```java
 // paste your Java/Spring Boot code, or relevant snippet, here
 ```
