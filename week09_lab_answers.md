@@ -2,7 +2,7 @@
 
 Name: Jade Roland Eduard C Pinon
 Student ID: 2511036
-GitHub repo: https://github.com/<arcticWulf123>/webdev2
+GitHub repo: <https://github.com/arcticWulf123/webdev2>
 Date submitted:
 
 ---
@@ -298,7 +298,7 @@ A many-to-many relationship must be modeled as an association entity if you need
 ## Task 3 — Fetch Strategies Experiment — LAZY vs EAGER
 
 **Approach / explanation:**
-I set Employee.department to FetchType.LAZY and reproduced the LazyInitializationException by loading an Employee through a non-transactional EmployeeService method, then accessing e.getDepartment().getName() outside of a transaction. To fix this, I tried two approaches: first, I moved the access inside a @Transactional(readOnly = true) method so the Hibernate session stayed open, and second, I used a JOIN FETCH query in my EmployeeRepository to load both the Employee and Department in a single query. I then compared the number of SQL queries between all three cases. 
+I set Employee.department to FetchType.LAZY and reproduced the LazyInitializationException by loading an Employee through a non-transactional EmployeeService method, then accessing e.getDepartment().getName() outside of a transaction. To fix this, I tried two approaches: first, I moved the access inside a @Transactional(readOnly = true) method so the Hibernate session stayed open, and second, I used a JOIN FETCH query in my EmployeeRepository to load both the Employee and Department in a single query. I then compared the number of SQL queries between all three cases.
 
 **Code / endpoint(s) used (if applicable):**
 
@@ -494,22 +494,176 @@ CascadeType.REMOVE deletes child entities when the parent is deleted. On the oth
 ## Task 5 — Capstone Milestone 2 — ERD to JPA Entity Model
 
 **Approach / explanation:**
-_[Write 2–4 sentences describing how you translated your ERD entities, cardinalities, owning sides, and FK/join tables.]_
+For Task 5, I modeled `AppUser` and `Pet` as a 1:1 relationship based on my capstone ERD. I made `Pet` the owning side by adding `@OneToOne(fetch = FetchType.LAZY)` with `@JoinColumn(name = "owner_id", unique = true)`, while `AppUser` was the inverse side with `@OneToOne(mappedBy = "owner", fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})`. I added `AppUserRepository` and `PetRepository`, and used a `@Transactional` `CommandLineRunner` to save and read back the object graph to verify the mapping worked.
 
 **Code / endpoint(s) used (if applicable):**
 
 ```java
-// paste your Java/Spring Boot code, or relevant snippet, here
+@Entity
+public class Pet {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    private String microChipNumber;
+    private String name;
+    private String species;
+    
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "owner_id", unique = true)
+    private AppUser owner;
+
+    public Pet(String microChipNumber, String name, String species, AppUser owner) {
+        this.microChipNumber = microChipNumber;
+        this.name = name;
+        this.species = species;
+        this.owner = owner;
+    }
+
+    public Pet() {
+    }
+
+    public AppUser getOwner() {
+        return owner;
+    }
+
+    public void setOwner(AppUser owner) {
+        this.owner = owner;
+    }
+
+    public String getMicroChipNumber() {
+        return microChipNumber;
+    }
+
+    public void setMicroChipNumber(String microChipNumber) {
+        this.microChipNumber = microChipNumber;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getSpecies() {
+        return species;
+    }
+
+    public void setSpecies(String species) {
+        this.species = species;
+    }
+
+}
+
+public interface PetRepository extends JpaRepository<Pet, Long>{
+    
+}
+
+@Entity
+@Table(name = "app_user")
+public class AppUser {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    private LocalDate createdAt;
+    private String username;
+    private String email;
+    @OneToOne(mappedBy = "owner", fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+    private Pet pet;
+
+    public AppUser(LocalDate createdAt, String username, String email, Pet pet) {
+        this.createdAt = createdAt;
+        this.username = username;
+        this.email = email;
+        this.pet = pet;
+    }
+
+    public AppUser(){}
+
+    public LocalDate getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDate createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public Pet getPet() {
+        return pet;
+    }
+
+    public void setPet(Pet pet) {
+        this.pet = pet;
+    }
+}
+
+public interface  AppUserRepository extends JpaRepository<AppUser, Long> {
+    
+}
+
+ @Override
+    @Transactional
+    public void run(String... args) {
+        // Create the user first
+        AppUser user = new AppUser(LocalDate.now(), "jade", "jade@example.com", null);
+        appUserRepository.save(user);
+
+        // Create the pet and link to the user
+        Pet pet = new Pet("000123456789012", "Milo", "Dog", user);
+        user.setPet(pet);
+        petRepository.save(pet);
+        appUserRepository.save(user);
+
+        entityManager.flush();
+        entityManager.clear();
+
+        // Read back to prove the 1:1 link works
+        AppUser loadedUser = appUserRepository.findById(user.getId()).orElseThrow();
+        System.out.println("User: " + loadedUser.getUsername() + " owns " + loadedUser.getPet().getName());
+    }
 ```
 
 **Evidence (screenshot filename, request/response sample, or file reference in this folder):**
-_[e.g. `task5_erd.png`, `task5_smoke_test.png`, or paste the ERD→entity table + passing test log here.]_
+![Task 5 smoke test](screenshots/task5_smoke_test.png)
 
 **Reflection question:**
 _For one relationship in your capstone model, state the cardinality, the owning side, where the FK/join table lives, and why you chose that fetch and cascade setting._
 
 Your answer:
-_[Write your answer here.]_
+For the AppUser–Pet relationship, the cardinality is 1:1. Pet is the owning side since it holds the foreign key owner_id via @JoinColumn(name = "owner_id", unique = true), so the FK lives in the pet table. AppUser is the inverse side with mappedBy = "owner". I set both sides to FetchType.LAZY to avoid loading the related entity unless it's actually accessed. For cascade, I only added CascadeType.PERSIST and CascadeType.MERGE on AppUser.pet so I could persist them together if needed, but I avoided CascadeType.REMOVE or CascadeType.ALL since a Pet should not be deleted just because its AppUser is removed. The unique = true on owner_id also enforces a true 1:1 instead of allowing a 1:N.
 
 ---
 
