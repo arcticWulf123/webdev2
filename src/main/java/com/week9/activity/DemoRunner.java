@@ -1,35 +1,61 @@
 package com.week9.activity;
 
+import java.time.LocalDate;
+
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
+
+import jakarta.persistence.EntityManager;
+import jakarta.transaction.Transactional;
 
 @Component
 public class DemoRunner implements CommandLineRunner {
     private final DepartmentRepository departmentRepository;
     private final EmployeeRepository employeeRepository;
     private final EmployeeService employeeService;
+    private final StudentRepository studentRepository;
+    private final CourseRepository courseRepository;
+    private final EntityManager entityManager;
+    private final EnrollmentRepository enrollmentRepository;
 
     public DemoRunner(DepartmentRepository departmentRepository, EmployeeRepository employeeRepository,
-            EmployeeService employeeService) {
+            EmployeeService employeeService, EntityManager entityManager, StudentRepository studentRepository,
+            CourseRepository courseRepository, EnrollmentRepository enrollmentRepository) {
         this.departmentRepository = departmentRepository;
         this.employeeRepository = employeeRepository;
         this.employeeService = employeeService;
+        this.entityManager = entityManager;
+        this.studentRepository = studentRepository;
+        this.courseRepository = courseRepository;
+        this.enrollmentRepository = enrollmentRepository;
     }
 
+    @Transactional
     @Override
     public void run(String... args) {
-        Department dept = new Department();
-        dept.setName("IT");
-        departmentRepository.save(dept);
+        // Create shared entities
+        Student s = new Student();
+        s.setName("Alice");
+        studentRepository.save(s);
 
-        Employee emp = new Employee();
-        emp.setDepartment(dept);
-        employeeRepository.save(emp);
+        Course c = new Course();
+        c.setTitle("WebDev");
+        courseRepository.save(c);
 
-        String deptName = employeeService.getDepartmentName(emp.getId());
-        System.out.println("Department" + deptName);
+        // Link them
+        Enrollment en = new Enrollment(s, c, LocalDate.now(), "A");
+        s.addEnrollment(en);
+        c.addEnrollment(en);
+        enrollmentRepository.saveAndFlush(en);
 
-        Employee e = employeeService.getEmployeeWithDepartment(emp.getId());
-        System.out.println(e.getDepartment().getName());
+        Long courseId = c.getId();
+
+        // Delete student only. Enrollment should be removed by orphanRemoval, course
+        // must survive
+        studentRepository.delete(s);
+        entityManager.flush();
+
+        boolean courseExists = courseRepository.findById(courseId).isPresent();
+        System.out.println("Course still exists: " + courseExists);
     }
 }

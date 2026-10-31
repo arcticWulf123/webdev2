@@ -2,7 +2,6 @@ package com.week9.activity;
 
 import java.util.ArrayList;
 import java.util.List;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -15,6 +14,10 @@ public class Course {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    public Long getId() {
+      return id;
+    }
+
     private String title;
     
     public String getTitle() {
@@ -25,7 +28,7 @@ public class Course {
         this.title = title;
     }
 
-     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
+     @OneToMany(mappedBy = "course")
   private List<Enrollment> enrollments = new ArrayList<>(); 
 
   public void addEnrollment(Enrollment enrollment) {

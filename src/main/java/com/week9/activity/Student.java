@@ -18,7 +18,8 @@ public class Student {
     this.name = name;
   }
 
-  public Student () {}
+  public Student() {
+  }
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -42,8 +43,8 @@ public class Student {
     this.name = name;
   }
 
-  @OneToMany(mappedBy = "student", cascade = CascadeType.ALL, orphanRemoval = true)
-  private List<Enrollment> enrollments = new ArrayList<>(); 
+  @OneToMany(mappedBy = "student", cascade = { CascadeType.PERSIST, CascadeType.MERGE }, orphanRemoval = true)
+  private List<Enrollment> enrollments = new ArrayList<>();
 
   public void addEnrollment(Enrollment enrollment) {
     enrollments.add(enrollment);

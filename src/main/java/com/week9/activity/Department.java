@@ -35,7 +35,7 @@ public class Department {
         this.name = name;
     }
 
-    @OneToMany(mappedBy = "department", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "department", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Employee> employees = new ArrayList<>();
 
     public List<Employee> findAllEmployees() {

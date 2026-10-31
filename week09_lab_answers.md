@@ -384,22 +384,110 @@ A LazyInitializationException happens when you try to access a lazily loaded pro
 ## Task 4 — Cascade + orphanRemoval — Safe vs. Dangerous
 
 **Approach / explanation:**
-_[Write 2–4 sentences describing your safe cascade choice, the orphan-removal test, and why REMOVE was avoided for shared entities.]_
+For Task 4, I treated Department and Employee as a composition, so I set Department.employees to cascade = {CascadeType.PERSIST, CascadeType.MERGE} with orphanRemoval = true. This allowed me to save new employees through the department and delete an employee by simply removing it from the collection. For the shared case, Student and Course are linked through Enrollment. I only added cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true to Student.enrollments, while leaving Course.enrollments with no cascade at all. This way, deleting a Student would only remove its Enrollment, but the shared Course would remain untouched.
 
 **Code / endpoint(s) used (if applicable):**
 
 ```java
-// paste your Java/Spring Boot code, or relevant snippet, here
+// Department.java (Safe Composition)
+@Entity 
+public class Department {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
+    private String name;
+
+    @OneToMany(mappedBy = "department", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
+    private List<Employee> employees = new ArrayList<>();
+
+    public void addEmployee(Employee employee) {
+        employees.add(employee);
+        employee.setDepartment(this);
+    }
+
+    public void removeEmployee(Employee employee) {
+        employees.remove(employee);
+        employee.setDepartment(null);
+    }
+}
+
+// Student.java (Safe for this test)
+@Entity
+public class Student {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String name;
+
+    @OneToMany(mappedBy = "student", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
+    private List<Enrollment> enrollments = new ArrayList<>();
+
+    public void addEnrollment(Enrollment enrollment) {
+        enrollments.add(enrollment);
+        enrollment.setStudent(this);
+    }
+}
+
+// Course.java (Shared Entity - NO Cascade)
+@Entity 
+public class Course {
+    @Id 
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String title;
+
+    @OneToMany(mappedBy = "course")
+    private List<Enrollment> enrollments = new ArrayList<>(); 
+
+    public void addEnrollment(Enrollment enrollment) {
+        enrollments.add(enrollment);
+        enrollment.setCourse(this);
+    }
+
+    public void removeEnrollment(Enrollment enrollment) {
+        enrollments.remove(enrollment);
+        enrollment.setCourse(null);
+    }
+}
+// DemoRunner.java (Shared Case Test)
+@Transactional
+@Override
+public void run(String... args) {
+    Student s = new Student();
+    s.setName("Alice");
+    studentRepository.save(s);
+
+    Course c = new Course();
+    c.setTitle("WebDev");
+    courseRepository.save(c);
+
+    Enrollment en = new Enrollment(s, c, LocalDate.now(), "A");
+    s.addEnrollment(en);
+    c.addEnrollment(en);
+    enrollmentRepository.saveAndFlush(en);
+
+    Long courseId = c.getId();
+
+    studentRepository.delete(s);
+    entityManager.flush();
+
+    boolean courseExists = courseRepository.findById(courseId).isPresent();
+    System.out.println("Course still exists: " + courseExists);
+}
 ```
 
 **Evidence (screenshot filename, request/response sample, or file reference in this folder):**
-_[e.g. `task4_orphan_deleted.png`, `task4_course_survives.png`, or paste before/after SELECT output here.]_
+![Task 3 orphan deleted](screenshots/task4_orphan_deleted.png)
+![Task 3 course survives](screenshots/task4_course_survives.png)
 
 **Reflection question:**
 _What is the difference between `CascadeType.REMOVE` and `orphanRemoval = true`, and in which situation is each appropriate or dangerous?_
 
 Your answer:
-_[Write your answer here.]_
+CascadeType.REMOVE deletes child entities when the parent is deleted. On the other hand, orphanRemoval = true deletes child entities when they are removed from the parent's collection, even if the parent still exists. orphanRemoval = true is ideal for composition cases like Department–Employee, where the child has no reason to exist without its parent. However, using CascadeType.REMOVE or CascadeType.ALL on shared entities like Student–Course is dangerous, since deleting one student could end up deleting a course that other students still rely on. In short, only cascade deletes when the child is fully owned by that parent.
 
 ---
 
