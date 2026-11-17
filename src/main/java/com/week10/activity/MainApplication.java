@@ -1,13 +1,13 @@
-package com.week9.activity;
+package com.week10.activity;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class PetApplication {
+public class MainApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(PetApplication.class, args);
+		SpringApplication.run(MainApplication.class, args);
 	}
 
 }
