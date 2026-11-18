@@ -1,8 +1,6 @@
 package com.week10.activity;
 
-import java.util.List;
-
-import org.springframework.http.HttpStatus;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,8 +10,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/departments")
@@ -25,95 +26,63 @@ public class DepartmentController {
     }
 
     @GetMapping
-    public ResponseEntity<List<DepartmentDTO>> getAllDepartments() {
-        List<DepartmentDTO> departments = departmentService.getAllDepartments();
-        return ResponseEntity.ok(departments);
+    public ResponseEntity<Page<DepartmentDTO>> getAllDepartments(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "id") String sort,
+            @RequestParam(defaultValue = "asc") String direction,
+            @RequestParam(required = false) String name) {
+
+        return ResponseEntity.ok(departmentService.listDepartments(page, size, sort, direction, name));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<DepartmentDTO> getDepartmentById(@PathVariable Long id) {
-        return departmentService.getDepartmentById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        return ResponseEntity.ok(departmentService.getDepartmentById(id));
     }
 
     @PostMapping
-    public ResponseEntity<?> createDepartment(@RequestBody CreateDepartmentRequest request) {
+    public ResponseEntity<DepartmentDTO> createDepartment(@Valid @RequestBody CreateDepartmentRequest request) {
         Department department = new Department();
         department.setName(request.getName());
-        try {
-            Department created = departmentService.createDepartment(department);
 
-            Long newId = created.getId();
-            var uri = ServletUriComponentsBuilder.fromCurrentRequest()
-                    .path("/{id}")
-                    .buildAndExpand(newId)
-                    .toUri();
+        Department created = departmentService.createDepartment(department);
 
-            DepartmentDTO dto = DepartmentDTO.from(created);
-            return ResponseEntity.created(uri).body(dto);
-        } catch (RuntimeException e) {
-            if (e.getMessage().equals("Department name already exists")) {
-                return ResponseEntity.status(HttpStatus.CONFLICT).body("Department name already exists");
-            }
-            throw e;
-        }
+        var uri = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(created.getId())
+                .toUri();
+
+        return ResponseEntity.created(uri).body(DepartmentDTO.from(created));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateDepartment(@PathVariable Long id, @RequestBody UpdateDepartmentRequest request) {
-        try {
-            Department department = new Department();
-            department.setName(request.getName());
-            Department updated = departmentService.updateDepartment(id, department);
-            DepartmentDTO dto = DepartmentDTO.from(updated);
-            return ResponseEntity.ok(dto);
-        } catch (RuntimeException e) {
-            if (e.getMessage().equals("Department name already exists")) {
-                return ResponseEntity.status(HttpStatus.CONFLICT).body("Department name already exists");
-            }
-            throw e;
-        }
+    public ResponseEntity<DepartmentDTO> updateDepartment(
+            @PathVariable Long id,
+            @Valid @RequestBody UpdateDepartmentRequest request) {
+
+        Department department = new Department();
+        department.setName(request.getName());
+
+        Department updated = departmentService.updateDepartment(id, department);
+        return ResponseEntity.ok(DepartmentDTO.from(updated));
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<?> patchDepartment(@PathVariable Long id, @RequestBody UpdateDepartmentRequest request) {
-        DepartmentDTO department = departmentService.getDepartmentById(id)
-                .map(d -> {
-                    if (request.getName() != null) {
-                        d.setName(request.getName());
-                    }
-                    return d;
-                })
-                .orElseThrow(() -> new RuntimeException("Department not found with id: " + id));
+    public ResponseEntity<DepartmentDTO> patchDepartment(
+            @PathVariable Long id,
+            @Valid @RequestBody UpdateDepartmentRequest request) {
 
-        Department existing = new Department();
-        existing.setId(department.getId());
-        existing.setName(department.getName());
+        Department department = new Department();
+        department.setName(request.getName());
 
-        if (request.getName() != null) {
-            existing.setName(request.getName());
-        }
-
-        try {
-            Department updated = departmentService.updateDepartment(id, existing);
-            DepartmentDTO dto = DepartmentDTO.from(updated);
-            return ResponseEntity.ok(dto);
-        } catch (RuntimeException e) {
-            if (e.getMessage().equals("Department name already exists")) {
-                return ResponseEntity.status(HttpStatus.CONFLICT).body("Department name already exists");
-            }
-            throw e;
-        }
+        Department updated = departmentService.updateDepartment(id, department);
+        return ResponseEntity.ok(DepartmentDTO.from(updated));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteDepartment(@PathVariable Long id) {
-        try {
-            departmentService.deleteDepartment(id);
-            return ResponseEntity.noContent().build();
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }
+    public ResponseEntity<Void> deleteDepartment(@PathVariable Long id) {
+        departmentService.deleteDepartment(id);
+        return ResponseEntity.noContent().build();
     }
 }

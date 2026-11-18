@@ -19,14 +19,14 @@ public class DemoRunner implements CommandLineRunner {
     @Override
     @Transactional
     public void run(String... args) {
-        Department dept = new Department();
-        dept.setName("IT");
-        departmentRepository.save(dept);
+        // Department dept = new Department();
+        // dept.setName("IT");
+        // departmentRepository.save(dept);
 
-        entityManager.flush();
-        entityManager.clear();
+        // entityManager.flush();
+        // entityManager.clear();
 
-        Department loaded = departmentRepository.findById(dept.getId()).orElseThrow();
-        System.out.println("Department: " + loaded.getName());
+        // Department loaded = departmentRepository.findById(dept.getId()).orElseThrow();
+        // System.out.println("Department: " + loaded.getName());
     }
 }
