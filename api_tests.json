@@ -1,0 +1,428 @@
+{
+  "info": {
+    "_postman_id": "b3f1c0a4-7d2e-4f5a-9c6b-1e8d4a2f9c11",
+    "name": "Week11 - Jade Roland API",
+    "description": "Week 11 lab collection for the Department API (pagination, validation, error handling). Run the app on http://localhost:8080 first.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "createdId",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "Create department (happy path)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 201\", () => pm.response.to.have.status(201));",
+              "const body = pm.response.json();",
+              "pm.test(\"Returns created department\", () => {",
+              "  pm.expect(body).to.have.property(\"id\");",
+              "  pm.expect(body.name).to.include(\"Research\");",
+              "});",
+              "pm.collectionVariables.set(\"createdId\", body.id);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"name\":\"Research {{$timestamp}}\"}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/departments",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "departments"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Get department by id",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 200\", () => pm.response.to.have.status(200));",
+              "const body = pm.response.json();",
+              "pm.test(\"Id matches created department\", () => pm.expect(String(body.id)).to.eql(String(pm.collectionVariables.get(\"createdId\"))));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/departments/{{createdId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "departments",
+            "{{createdId}}"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Update department (PUT)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 200\", () => pm.response.to.have.status(200));",
+              "const body = pm.response.json();",
+              "pm.test(\"Name was updated\", () => pm.expect(body.name).to.include(\"Research Updated\"));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"name\":\"Research Updated {{$timestamp}}\"}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/departments/{{createdId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "departments",
+            "{{createdId}}"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Patch department (PATCH)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 200\", () => pm.response.to.have.status(200));",
+              "const body = pm.response.json();",
+              "pm.test(\"Name was patched\", () => pm.expect(body.name).to.include(\"Research Patched\"));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"name\":\"Research Patched {{$timestamp}}\"}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/departments/{{createdId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "departments",
+            "{{createdId}}"
+          ]
+        }
+      }
+    },
+    {
+      "name": "List departments (paginated)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 200\", () => pm.response.to.have.status(200));",
+              "const body = pm.response.json();",
+              "pm.test(\"Page metadata is present\", () => {",
+              "  pm.expect(body).to.have.property(\"totalElements\");",
+              "  pm.expect(body).to.have.property(\"totalPages\");",
+              "  pm.expect(body.content).to.be.an(\"array\");",
+              "});",
+              "pm.test(\"Page size is 5\", () => pm.expect(body.size).to.eql(5));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/departments?page=0&size=5&sort=name,asc",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "departments"
+          ],
+          "query": [
+            {
+              "key": "page",
+              "value": "0"
+            },
+            {
+              "key": "size",
+              "value": "5"
+            },
+            {
+              "key": "sort",
+              "value": "name,asc"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Filter departments by name",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 200\", () => pm.response.to.have.status(200));",
+              "const body = pm.response.json();",
+              "pm.test(\"At least one result\", () => pm.expect(body.content.length).to.be.above(0));",
+              "pm.test(\"Every result matches the filter\", () => {",
+              "  body.content.forEach((d) => pm.expect(d.name.toLowerCase()).to.include(\"research\"));",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/departments?name=Research",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "departments"
+          ],
+          "query": [
+            {
+              "key": "name",
+              "value": "Research"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "List departments (size cap 100)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 200\", () => pm.response.to.have.status(200));",
+              "const body = pm.response.json();",
+              "pm.test(\"Requested 999 is capped to 100\", () => {",
+              "  pm.expect(body.size).to.eql(100);",
+              "  pm.expect(body.pageable.pageSize).to.eql(100);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/departments?size=999",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "departments"
+          ],
+          "query": [
+            {
+              "key": "size",
+              "value": "999"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Create department (missing name)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 400\", () => pm.response.to.have.status(400));",
+              "const body = pm.response.json();",
+              "pm.test(\"errors array is populated\", () => {",
+              "  pm.expect(body.errors).to.be.an(\"array\");",
+              "  pm.expect(body.errors.length).to.be.above(0);",
+              "  pm.expect(body.errors[0].field).to.eql(\"name\");",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/departments",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "departments"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Get non-existent department",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 404\", () => pm.response.to.have.status(404));",
+              "const body = pm.response.json();",
+              "pm.test(\"ErrorResponse shape\", () => {",
+              "  pm.expect(body.status).to.eql(404);",
+              "  pm.expect(body.message).to.include(\"not found\");",
+              "  pm.expect(body).to.have.property(\"timestamp\");",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/departments/99999",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "departments",
+            "99999"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Delete department (cleanup)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 204\", () => pm.response.to.have.status(204));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/departments/{{createdId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "departments",
+            "{{createdId}}"
+          ]
+        }
+      }
+    }
+  ]
+}
