@@ -21,8 +21,8 @@
 
 **DTO files with annotations** *(link to files in your repo)*:
 
-- `CreateDepartmentRequest.java`:
-- `UpdateDepartmentRequest.java`:
+- [CreateDepartmentRequest.java](https://github.com/arcticWulf123/webdev2/blob/week11/src/main/java/com/week10/activity/CreateDepartmentRequest.java)
+- [UpdateDepartmentRequest.java](https://github.com/arcticWulf123/webdev2/blob/week11/src/main/java/com/week10/activity/UpdateDepartmentRequest.java)
 
 **Evidence of 400 response for missing field:**
 
@@ -43,9 +43,9 @@
 
 **Files created:**
 
-- `GlobalExceptionHandler.java`:
-- `ErrorResponse.java`:
-- `ResourceNotFoundException.java`:
+- [GlobalExceptionHandler.java](https://github.com/arcticWulf123/webdev2/blob/week11/src/main/java/com/week10/activity/GlobalExceptionHandler.java)
+- [ErrorResponse.java](https://github.com/arcticWulf123/webdev2/blob/week11/src/main/java/com/week10/activity/ErrorResponse.java)
+- [ResourceNotFoundException.java](https://github.com/arcticWulf123/webdev2/blob/week11/src/main/java/com/week10/activity/ResourceNotFoundException.java)
 
 **Evidence — 404 response:**
 
@@ -84,7 +84,7 @@
 
 **File created:**
 
-- `WebConfig.java`:
+- [WebConfig.java](https://github.com/arcticWulf123/webdev2/blob/week11/src/main/java/com/week10/activity/WebConfig.java)
 
 **Evidence — CORS headers present:**
 
@@ -111,9 +111,9 @@ Content-Length: 0
 
 **Files updated:**
 
-- Repository method added:
-- Service method updated:
-- Controller method updated:
+- [DepartmentRepository.java](https://github.com/arcticWulf123/webdev2/blob/week11/src/main/java/com/week10/activity/DepartmentRepository.java)
+- [DepartmentService.java](https://github.com/arcticWulf123/webdev2/blob/week11/src/main/java/com/week10/activity/DepartmentService.java)
+- [DepartmentController.java](https://github.com/arcticWulf123/webdev2/blob/week11/src/main/java/com/week10/activity/DepartmentController.java)
 
 **Evidence — paginated response:**
 
@@ -185,14 +185,14 @@ Requesting `?size=999` returned `"size": 100` and `"pageable": { "pageSize": 100
 
 **Files committed:**
 
-- `API.md` location in repo: repository root
-- `api_tests.json` location in repo: repository root
+- [API.md](https://github.com/arcticWulf123/webdev2/blob/week11/API.md) — repository root
+- [api_tests.json](https://github.com/arcticWulf123/webdev2/blob/week11/api_tests.json) — repository root
 
 **Test collection run evidence:**
 
 > Paste a screenshot link or describe the test run result (e.g., "5/5 requests passed"):
 
-![Postman collection run](screenshots/collection_tests.png)
+![Postman collection run](https://raw.githubusercontent.com/arcticWulf123/webdev2/week11/screenshots/collection_tests.png)
 
 10/10 requests passed, 21/21 assertions passed, 0 failures.
 
