@@ -1,4 +1,4 @@
-package com.week10.activity;
+package com.midterm.exception;
 
 public class ResourceNotFoundException extends RuntimeException {
 

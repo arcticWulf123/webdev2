@@ -1,4 +1,4 @@
-package com.week10.activity;
+package com.midterm.dto;
 
 import java.time.Instant;
 import java.util.List;

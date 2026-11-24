@@ -1,4 +1,4 @@
-package com.week10.activity;
+package com.midterm;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
