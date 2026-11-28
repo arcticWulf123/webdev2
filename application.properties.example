@@ -1,0 +1,12 @@
+# Copy these values into your environment (or an untracked local file).
+# Never commit real credentials.
+
+DB_URL=jdbc:mysql://127.0.0.1:3307/infoman1_catalog?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+DB_USER=CHANGE_ME
+DB_PASSWORD=CHANGE_ME
+
+# PowerShell example:
+#   $env:DB_URL="jdbc:mysql://127.0.0.1:3307/infoman1_catalog?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC"
+#   $env:DB_USER="catalog_app"
+#   $env:DB_PASSWORD="your-password"
+#   .\mvnw.cmd spring-boot:run
