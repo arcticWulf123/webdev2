@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Product Catalog</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <h1>Product Catalog</h1>
+    <p class="tagline">Read-only browser for the Spring Boot product API.</p>
+  </header>
+
+  <main class="layout">
+    <section class="panel" aria-labelledby="list-heading">
+      <div class="panel-head">
+        <h2 id="list-heading">Products</h2>
+        <label class="field">
+          <span>Category</span>
+          <select id="category-filter">
+            <option value="">All categories</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="status-row">
+        <p id="list-status" class="status" role="status" aria-live="polite"></p>
+        <button type="button" id="retry" class="retry" hidden>Retry</button>
+      </div>
+
+      <table class="products" id="product-table" hidden>
+        <caption class="visually-hidden">Products on the current page</caption>
+        <thead>
+          <tr>
+            <th scope="col">Name</th>
+            <th scope="col">SKU</th>
+            <th scope="col">Category</th>
+            <th scope="col" class="num">Price</th>
+            <th scope="col" class="num">Stock</th>
+            <th scope="col">Status</th>
+            <th scope="col"><span class="visually-hidden">Detail</span></th>
+          </tr>
+        </thead>
+        <tbody id="product-rows"></tbody>
+      </table>
+
+      <nav class="pager" aria-label="Product pages">
+        <button type="button" id="prev-page" disabled>Previous</button>
+        <span id="page-indicator">Page &ndash;</span>
+        <button type="button" id="next-page" disabled>Next</button>
+      </nav>
+    </section>
+
+    <aside class="panel" aria-labelledby="detail-heading">
+      <h2 id="detail-heading">Product detail</h2>
+
+      <form id="detail-form" class="detail-form">
+        <label class="field">
+          <span>Load by product ID</span>
+          <input type="number" id="detail-id" min="1" step="1" placeholder="e.g. 6">
+        </label>
+        <button type="submit">Load</button>
+      </form>
+
+      <p id="detail-status" class="status" role="status" aria-live="polite">
+        Select a product to see its details.
+      </p>
+
+      <dl id="detail-fields" class="detail" hidden>
+        <div class="detail-row"><dt>Name</dt><dd id="detail-name"></dd></div>
+        <div class="detail-row"><dt>SKU</dt><dd id="detail-sku"></dd></div>
+        <div class="detail-row"><dt>Category</dt><dd id="detail-category"></dd></div>
+        <div class="detail-row"><dt>Price</dt><dd id="detail-price"></dd></div>
+        <div class="detail-row"><dt>Stock</dt><dd id="detail-stock"></dd></div>
+        <div class="detail-row"><dt>Status</dt><dd id="detail-status-value"></dd></div>
+        <div class="detail-row"><dt>Product ID</dt><dd id="detail-id-value"></dd></div>
+      </dl>
+    </aside>
+  </main>
+
+  <script src="js/config.js" defer></script>
+  <script src="js/api.js" defer></script>
+  <script src="js/app.js" defer></script>
+</body>
+</html>
